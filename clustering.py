@@ -1,24 +1,21 @@
-import csv
+import random
+import pprint
+from csv import reader
 import math
-import operator
 import numpy as np
  
-def loadDataset(filename, p, split, trainSet=[] , testSet=[]):
-	with open(filename, 'r') as csvfile:
-		lines = csv.reader(csvfile)
-		dataset = list(lines)
-		np.random.shuffle(dataset)
-		for x in range(len(dataset)-1):
-			for y in range(8):
-				dataset[x][y] = float(dataset[x][y])
-			if x >= p and x < min(p+split, len(dataset)-1):
-				testSet.append(dataset[x])
-			else:
-				trainSet.append(dataset[x])
+def loadDataset(filename):
+	ds = np.loadtxt(filename, delimiter='\t')
+	return ds
 
+def euclideanDistance(instance1, instance2, length):
+	distance = 0
+	for x in range(length):
+		distance += pow((instance1[x] - instance2[x]), 2)
+	return math.sqrt(distance)
 
-	
 def main():
-	
-	
+	data = loadDataset('seeds.txt')
+	print('data :', data[0][3])
+
 main()
