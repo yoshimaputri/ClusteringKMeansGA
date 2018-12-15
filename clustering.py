@@ -1,36 +1,45 @@
-import random
-import pprint
-from csv import reader
-import math
 import numpy as np
-from matplotlib import pyplot as plt
 
 class kMeans:
-    def __init__(self, dataset, k):
-        self.data = dataset
-        self.k = k
-        self.centroids = self.initialize_centroids()
-        self.clusters = []
-    def initialize_centroids(self):
-        centroids = self.data.copy()
-        np.random.shuffle(centroids)
-        return centroids[:self.k]
-    def closest_centroids(self, data):
-        dist = []
-        #Cari jarak terpendek dari data ke centroid, return centroid ke berapa
-        for j in self.centroids:
-            dist.append(euclideanDistance(data, j, data.shape[0]))
-        return np.argmin(dist, axis=0)
-    def clustering(self):
-        for j in range(self.k):
-            self.clusters.append([])
-        for i in self.data:
-            index = self.closest_centroids(i)
-            self.clusters[index].append(i)
-        return self.clusters
-    def update_centroids(self):
-        return np.mean(self.clusters, axis=0)
-        
+	def __init__(self, dataset, k):
+		self.data = dataset
+		self.k = k
+		self.centroids = self.initialize_centroids()
+		self.clusters = []
+	def initialize_centroids(self):
+		centroids = self.data.copy()
+		np.random.shuffle(centroids)
+		return centroids[:self.k]
+	def new_centroid(self, cluster, index, new_c):
+		i = index
+		length = len(cluster[i])
+		centro = []
+		for a in range(7):
+			centro.append([])
+		for x in range(length):
+			data_ = dataset[cluster[i][x], :-1]
+			for y in range(len(data_)):
+				centro[y].append(data_[y])
+		for z in range(len(data_)):
+			Centro = np.mean(centro[z])
+			new_c[index].append(Centro)
+		return new_c
+	def clustering(self):
+		cluster = []
+		new_c = []
+		for i in range(k):
+		    cluster.append([])
+		    new_c.append([])
+		for i in range(len(dataset)):
+		    dist = []
+		    for j in range(len(initC)):
+		        dist.append(euclid(dataset[i,:-1], initC[j,:-1], 7)) # calculate distance all data with centroid
+		    ind = np.argmin(dist) # get minimum dist to clustering
+		    cluster[ind].append(i)
+		for i in range(k):
+		    centroid_ = new_centroid(cluster, i, new_c)
+		print(centroid_)
+		
 def loadDataset(filename):
 	ds = np.loadtxt(filename, delimiter='\t')
 	return ds
@@ -39,23 +48,11 @@ def euclideanDistance(instance1, instance2, length):
 	distance = 0
 	for x in range(length):
 		distance += pow((instance1[x] - instance2[x]), 2)
-	return math.sqrt(distance)
-    
+	return (np.sqrt(distance))
+	
 def main():
-    data = loadDataset('seeds.txt')
-    dataSeed= data[:,:7]
-    k=3
-    
-    obj = kMeans(dataSeed, k)
-    clusters = obj.clustering()  
-    newCentroids = obj.update_centroids()
-    
-    for i in range(k):
-        print("cluster %d" % i)
-        print(len(clusters[i]))
-    #print(clusters[0])
-    #print("\n\n\n")
-   # print(newCentroids)
-    
+	data = loadDataset('seeds.txt')
+	dataSeed = data[:,:8]
+	k=3
 
 main()
