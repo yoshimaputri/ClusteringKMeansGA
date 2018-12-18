@@ -47,6 +47,16 @@ def crossOver(prob):
 			totChild+=2
 	# print("totChild: ", totChild)
 	return totChild
+
+def mutation(nP, chromosomes): #
+    # Mutation changes a single gene in each offspring randomly.
+    #print(chromosomes)
+    for idx in range(len(np)):
+        # The random value to be added to the gene.
+        random_value = np.random.uniform(0.0, 1.0)
+        chromosomes[idx,3] = chromosomes[idx,3] + random_value
+
+    return chromosomes
 	
 def getCentroidPop(i):
 	cluster.centroids = cluster.populasi[i]
