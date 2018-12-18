@@ -1,9 +1,9 @@
 import K_means
-from operator import itemgetter
+import numpy as np
 import random
+from operator import itemgetter
 from sklearn.decomposition import IncrementalPCA
 import matplotlib.pyplot as plt
-import numpy as np
 
 def createPopulation():
 	c = []
@@ -11,18 +11,16 @@ def createPopulation():
 	for i in range(k):
 		c.append(i*70)
 		gen.append([])
-	for x in range(0, 70): #populasi , size = 70
+	for x in range(0, 70): #populasi size = 70
 		cluster.chromosome = []
 		for y in range(k):
 			gen[y] = [cluster.data[i][c[y]] for i in range(1, len(cluster.data))]
 			cluster.chromosome.append(gen[y])
-
 		cluster.populasi.append(cluster.chromosome)
 		for z in range(k):
 			c[z]+=1
-	# print("Populasi: ", cluster.populasi)
 
-def cross_over2(ProbabilityChromosomes):
+def crossOver(ProbabilityChromosomes):
 	parent = []
 	crossOverRate = 0.25
 	jumlahChild = 0
@@ -62,23 +60,22 @@ def evaluasi_populasi(i):
 	cluster.centroids = cluster.populasi[i]
 
 k = 3
+f = []
 cluster = K_means.Kmeans('seeds.txt', k)
-# print(type(cluster))
 createPopulation()
-fitness = []
+
 for i in range(0, 70):
-	evaluasi_populasi(i)
-	cluster.kClustering()
+	evaluasi_populasi(i) # ngambil centroid d masing2 populasi
+	cluster.clustering()
 	centroid, sse, akurasi = cluster.groupData()
 	eval = centroid, sse, akurasi
-	fitness.append(eval)
-	# print("Data fitness: ", fitness)
+	f.append(eval)
+	# print("Data f: ", f)
 	#print("Data cluster: ", cluster.data)
 	#print("Chromosome: ", centroid)
 	# print("SSE chromosome: %.2f" % sse)
 	#print("AKurasi chromosome: %.2f" % akurasi)
-#print("fitness: ", fitness)
-sortedFitness = sorted(fitness, key=itemgetter(2), reverse=True) #sort pake akurasi (2)
+sortedFitness = sorted(f, key=itemgetter(2), reverse=True) #sort pake akurasi (2)
 #print("sortedFitness: ", sortedFitness)
 
 #Proses seleksi
@@ -103,32 +100,32 @@ for i in range(0, 70):
 #print("Probality Chrom: ", ProbabilityChromosomes)
 #print("newGeneration1: ", newGeneration1)
 
-jumlahOffspring = cross_over2(newGeneration1)
+jumlahOffspring = crossOver(newGeneration1)
 newGeneration = []
 generasi = 0
 
 for i in range(2):
-	fitness = []
+	f = []
 	newGeneration = []
 	for i in range(0, jumlahOffspring):
 		evaluasi_populasi(i)
-		cluster.kClustering()
+		cluster.clustering()
 		centroid, sse, akurasi = cluster.groupData()
 		eval = centroid, sse, akurasi
-		fitness.append(eval)
+		f.append(eval)
 		newGeneration.append(centroid)
 		#print("SSE chromosome: %.2f" % sse)
 		#print("AKurasi chromosome: %.2f" % akurasi)
 	generasi+=1
 	#print("New Geneartion iter: ", newGeneration)
-	jumlahOffspring = cross_over2(newGeneration)
+	jumlahOffspring = crossOver(newGeneration)
 	newGeneration = []
-	sortedFitness = sorted(fitness, key=itemgetter(2), reverse=True)
+	sortedFitness = sorted(f, key=itemgetter(2), reverse=True)
 	#print("sortedFitness: ", sortedFitness)
 	print("Generasi ke-%d" % generasi)
 
 cluster.centroids = sortedFitness[0][0]
-cluster.kClustering()
+cluster.clustering()
 centroid, sse, akurasi = cluster.groupData()
 
 datased = []
@@ -157,12 +154,11 @@ C = np.array(centroid)
 ipca2 = IncrementalPCA(n_components=2)
 ipca2.fit(C)
 pca2 = ipca2.transform(C)
-# cluster[0][0]
+
 fig, axs = plt.subplots(1, 1, figsize=(5,5))
 for i in range(k):
 	color = "#%06x" % random.randint(0, 0xFFFFFF)
 	for j in range(len(clustered)):
-		# ke = cluster[i][j]
 		if (clustered[j] == i+1):
 			x = pca[j,0]
 			y = pca[j,1]
