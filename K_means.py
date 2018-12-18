@@ -55,16 +55,13 @@ class Kmeans:
 	def minDistance(self, i): # min distance per data with centroid
 		MIN = 9999
 		numCluster = 0
-
 		for centroid in range(self.k):
 			jarak = self.euclid(i, centroid)
 			if jarak < MIN:
 				MIN = jarak
 				numCluster = centroid
-
 		if numCluster != self.memberCluster[i]:
 			self.jmlData += 1
-
 		self.SSE += (MIN**2)
 
 		return numCluster
@@ -86,36 +83,29 @@ class Kmeans:
 		while not konvergen:
 			self.iter += 1
 			self.clusterData()
-
 			# print("jumlah data berubah", self.jmlData)
 			if float(self.jmlData)/len(self.memberCluster) < 0.01:
 				konvergen = True
 		# print("jumlah iterasi: ", self.iter)
 
 	def groupData(self):
-		akurasi = []
+		acc = []
 		allMember = 0
 		for centroid in range(len(self.centroids)):
-			clustered = [[] for i in range(self.k)]
-			for i in range(self.k): # inisiasi jumlah per cluster
-				clustered[i] = 0
+			cluster1 = cluster2 = cluster3 = 0
 			for nama in [self.data[0][i] for i in range(len(self.data[0])) if self.memberCluster[i] == centroid]:
-				# ngitung cluster terakhir
 				if nama == "1\n":
-					clustered[0] += 1
+					cluster1 += 1
 				elif nama == "2\n":
-					clustered[1] += 1
+					cluster2 += 1
 				elif nama == "3\n":
-					clustered[2] += 1
-			for i in range(self.k):
-				allMember += clustered[i]
-
-			maximum = max(clustered)
-			akurasi.append(float(maximum)/float(allMember))
-
+					cluster3 += 1
+			allMember = cluster1+cluster2+cluster3
+			maximum = max(cluster1, cluster2, cluster3)
+			acc.append(float(maximum)/float(allMember))
 		resAcc = 0
-		for i in range(0, len(akurasi)):
-			resAcc += akurasi[i]
-		self.akurasi = (resAcc / 3.0) * 100
+		for i in range(0, len(acc)):
+			resAcc += acc[i]
+		self.acc = (resAcc / 3.0) * 100
 		# print("centroids now", self.centroids)
-		return self.centroids, self.SSE, self.akurasi
+		return self.centroids, self.SSE, self.acc

@@ -20,114 +20,100 @@ def createPopulation():
 		for z in range(k):
 			c[z]+=1
 
-def crossOver(ProbabilityChromosomes):
+def crossOver(prob):
 	parent = []
-	crossOverRate = 0.25
-	jumlahChild = 0
-	del cluster.populasi[:]
-	for i in range(len(ProbabilityChromosomes)):
+	cluster.populasi = []
+	crossOverRate = 0.3
+	totChild = 0
+	
+	for i in range(len(prob)):
 		R = random.uniform(0,1)
 		if R < crossOverRate:
-			parent.append(ProbabilityChromosomes[i])
-	#print("Parent Chrom: ", parent)
+			parent.append(prob[i])
 	for i in range(len(parent)):
 		for j in range(i+1, len(parent)):
-			offspring1 = []
-			offspring2 = []
-
-			mother = parent[i]
-			#print("Mother: ", mother)
-			father = parent[j]
-			#print("Father: ", father)
-			offspring1.append(mother[0])
-			offspring1.append(father[1])
-			offspring1.append(father[2])
-
-			offspring2.append(father[0])
-			offspring2.append(mother[1])
-			offspring2.append(mother[2])
-			#child1 = mother[0] + father[1] + father[2]
-			#child2 = father[0] + mother[1] + mother[2]
-			#print("child1: ", offspring1)
-			#print("child2: ", offspring2)
-			cluster.populasi.append(offspring1)
-			cluster.populasi.append(offspring2)
-			jumlahChild+=2
-	#print("jumlahChild: ", jumlahChild)
-	return jumlahChild
+			os1 = []
+			os2 = []
+			x = parent[i]
+			y = parent[j]
+			os1.append(x[0])
+			os1.append(y[1])
+			os1.append(y[2])
+			os2.append(y[0])
+			os2.append(x[1])
+			os2.append(x[2])
+			cluster.populasi.append(os1)
+			cluster.populasi.append(os2)
+			totChild+=2
+	# print("totChild: ", totChild)
+	return totChild
 	
-def evaluasi_populasi(i):
+def getCentroidPop(i):
 	cluster.centroids = cluster.populasi[i]
 
 k = 3
-f = []
+fitness = []
 cluster = K_means.Kmeans('seeds.txt', k)
+
+#------------------------- POPULATION, CHROMOSOME, CLUSTERING -------------------------#
 createPopulation()
 
 for i in range(0, 70):
-	evaluasi_populasi(i) # ngambil centroid d masing2 populasi
+	getCentroidPop(i) # ngambil centroid d masing2 populasi
 	cluster.clustering()
-	centroid, sse, akurasi = cluster.groupData()
-	eval = centroid, sse, akurasi
-	f.append(eval)
-	# print("Data f: ", f)
-	#print("Data cluster: ", cluster.data)
-	#print("Chromosome: ", centroid)
-	# print("SSE chromosome: %.2f" % sse)
-	#print("AKurasi chromosome: %.2f" % akurasi)
-sortedFitness = sorted(f, key=itemgetter(2), reverse=True) #sort pake akurasi (2)
-#print("sortedFitness: ", sortedFitness)
+	centroid, SSE, acc = cluster.groupData()
+	result = centroid, SSE, acc
+	fitness.append(result)
+	# per chromosome->centroid punya fitness function
+	# print("SSE chromosome: %.2f" % SSE)
+	# print("Acc chromosome: %.2f" % acc)
 
-#Proses seleksi
-TotalFitness = 0
+#--------------------------------- SELECTION ----------------------------------#
+sortedFitness = sorted(fitness, key=itemgetter(2), reverse=True) # sorting akurasi
+totF = 0
 for count in range(0,70):
-	TotalFitness += sortedFitness[count][1]
-#print("TotalFitness: ", TotalFitness) 
+	totF += sortedFitness[count][1]
+# print("totF: ", totF)
 
-ProbabilityChromosomes = []
-jumlah = 0
-for count in range(0,70):
-	ProbabilityChromosomes.append((sortedFitness[count][0],sortedFitness[count][1]/TotalFitness*100))
+probChromosome = []
+for i in range(0,70):
+	probChromosome.append((sortedFitness[i][0], sortedFitness[i][1]/totF*100))
+# print("probChromosome", probChromosome)
 
-newGeneration1 = []
+#-------------------------- NEW GENERATION || FROM CROSS OVER --------------------------#
+newGen = []
 for i in range(0, 70):
 	R = random.uniform(0, 1)
-	if R > ProbabilityChromosomes[i][1] and R < ProbabilityChromosomes[i+1][1]:
-		newGeneration1.append(ProbabilityChromosomes[i+1][0])
+	if R > probChromosome[i][1] and R < probChromosome[i+1][1]:
+		newGen.append(probChromosome[i+1][0])
 	else:
-		newGeneration1.append(ProbabilityChromosomes[i][0])
+		newGen.append(probChromosome[i][0])
 
-#print("Probality Chrom: ", ProbabilityChromosomes)
-#print("newGeneration1: ", newGeneration1)
-
-jumlahOffspring = crossOver(newGeneration1)
+jumlahOffspring = crossOver(newGen)
 newGeneration = []
-generasi = 0
+generasiKe = 0
 
 for i in range(2):
 	f = []
 	newGeneration = []
 	for i in range(0, jumlahOffspring):
-		evaluasi_populasi(i)
+		getCentroidPop(i)
 		cluster.clustering()
-		centroid, sse, akurasi = cluster.groupData()
-		eval = centroid, sse, akurasi
-		f.append(eval)
+		centroid, SSE, acc = cluster.groupData()
+		result = centroid, SSE, acc
+		f.append(result)
 		newGeneration.append(centroid)
-		#print("SSE chromosome: %.2f" % sse)
-		#print("AKurasi chromosome: %.2f" % akurasi)
-	generasi+=1
-	#print("New Geneartion iter: ", newGeneration)
+	generasiKe+=1
+
 	jumlahOffspring = crossOver(newGeneration)
 	newGeneration = []
 	sortedFitness = sorted(f, key=itemgetter(2), reverse=True)
-	#print("sortedFitness: ", sortedFitness)
-	print("Generasi ke-%d" % generasi)
-
+	# print("Generasi ke-%d" % generasiKe)
 cluster.centroids = sortedFitness[0][0]
 cluster.clustering()
-centroid, sse, akurasi = cluster.groupData()
+centroid, SSE, acc = cluster.groupData()
 
+#--------------------------------- GENERATE SCATTER ----------------------------------#
 datased = []
 clustered = []
 for i in range(210):
@@ -139,10 +125,9 @@ for j in range(210):
 	for i in range(7):
 		datased[j].append(cluster.data[i+1][j])
 
-# print("data", datased)
-print("Centroid terbaik: \n", centroid)
-print("Akurasi: ", akurasi)
-print("SSE: ", sse)
+print("Best Centroid :\n", np.array(centroid))
+print("Accuracy :", acc)
+print("SSE :", SSE)
 # print("cluster", cluster)
 
 X = datased
