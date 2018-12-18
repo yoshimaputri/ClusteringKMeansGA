@@ -11,13 +11,13 @@ def cariMean(alist):
 	else:
 		return (temp[alen // 2] + temp[(alen // 2) - 1]) / 2
 
-def normalisasiKolom(kolom):
+def normalize(kolom):
 	hasil = []
 	for c in range(len(kolom)):
 		hasil.append((kolom[c] - min(kolom)) / (max(kolom) - min(kolom)))
 	return hasil
 
-class KMeans:
+class Kmeans:
 	def __init__(self, namaFile, k):
 		self.k = k
 		self.populasi = []
@@ -64,7 +64,7 @@ class KMeans:
 		#print("Self data before: ", self.data)
 
 		for i in range(1, self.kolom):
-			self.data[i] = normalisasiKolom(self.data[i])
+			self.data[i] = normalize(self.data[i])
 
 		#print("self data after: ", self.data)
 
@@ -156,14 +156,13 @@ class KMeans:
 			self.pointsChanged += 1
 
 		self.sse+=minimum**2
-		# print("minimum", minimum)
+		# print("clusterNomor", clusterNomor)
 		return clusterNomor
 
 	def masukanVectorKeCluster(self):
 		self.pointsChanged = 0
 		self.sse = 0
-		self.memberOf = [self.masukanVectorKeClusterBerdasarCentroid(i)
-							for i in range(len(self.data[1]))]
+		self.memberOf = [self.masukanVectorKeClusterBerdasarCentroid(i) for i in range(len(self.data[1]))]
 		#print("Jumlah data ke 1", len(self.data[1]))
 		#print("member of di masukkan ke cluster", self.memberOf)
 
@@ -188,22 +187,21 @@ class KMeans:
 				selesai = True
 
 		#print("Jumlah Iterasi: ", self.iterationNumber)
-	def pengelompokanData(self):
+	def groupData(self):
 		akurasi = []
 		for centroid in range(len(self.centroids)):
 			#print("\n\nKelas %i\n---------------" % centroid)
 			
 			clus1 = clus2 = clus3 = 0
-			for nama in [self.data[0][i] for i in range(len(self.data[0]))
-					if self.memberOf[i] == centroid]:
-						#print(nama)
-						if nama == "1\n":
-							clus1 += 1
-						elif nama == "2\n":
-							clus3 += 1
-						elif nama == "3\n":
-							clus2 += 1
-			
+			for nama in [self.data[0][i] for i in range(len(self.data[0])) if self.memberOf[i] == centroid]:
+				#print(nama)
+				if nama == "1\n":
+					clus1 += 1
+				elif nama == "2\n":
+					clus3 += 1
+				elif nama == "3\n":
+					clus2 += 1
+	
 			jumlahMemberCluster = clus1+clus2+clus3
 			#print("Jumlah member cluster: ", jumlahMemberCluster)
 			maximum = max(clus3, clus2, clus1)
@@ -221,5 +219,5 @@ class KMeans:
 # km = KMeans('seeds.txt', 3)
 # km.kClustering()
 # print("halo halo")
-# km.pengelompokanData()
+# km.groupData()
 # print("masuk sini gaes")

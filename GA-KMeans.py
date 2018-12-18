@@ -1,6 +1,14 @@
-import kmeans
+import k_means
 from operator import itemgetter
 import random
+import numpy as np
+from sklearn.decomposition import IncrementalPCA
+import matplotlib.pyplot as plt
+
+import itertools
+import threading
+import time
+import sys
 
 def make_populasi():
 	c1 = 0
@@ -63,8 +71,9 @@ def cross_over2(ProbabilityChromosomes):
 def evaluasi_populasi(i):
 	cluster.centroids = cluster.populasi[i]
 
-cluster = kmeans.KMeans('seeds.txt', 3)
-print(type(cluster))
+k = 3
+cluster = k_means.KMeans('seeds.txt', k)
+#print(type(cluster))
 make_populasi()
 fitness = []
 for i in range(0, 70):
@@ -74,8 +83,8 @@ for i in range(0, 70):
 	eval = centroid, sse, akurasi
 	fitness.append(eval)
 	# print("Data fitness: ", fitness)
-	#print("Data cluster: ", cluster.data)
-	#print("Chromosome: ", centroid)
+	# print("Data cluster: ", cluster.data)
+	# print("Chromosome: ", centroid)
 	print("SSE chromosome: %.2f" % sse)
 	#print("AKurasi chromosome: %.2f" % akurasi)
 #print("fitness: ", fitness)
@@ -121,7 +130,7 @@ for i in range(2):
 		newGeneration.append(centroid)
 		#print("Data cluster: ", cluster.data)
 		#print("Chromosome: ", centroid)
-		#print("SSE chromosome: %.2f" % sse)
+		# print("SSE chromosome: %.2f" % sse)
 		#print("AKurasi chromosome: %.2f" % akurasi)
 	generasi+=1
 	#print("New Geneartion iter: ", newGeneration)
@@ -134,9 +143,33 @@ for i in range(2):
 cluster.centroids = sortedFitness[0][0]
 cluster.kClustering()
 centroid, sse, akurasi = cluster.pengelompokanData()
+
+#print data
+# print("Data cluster: ", cluster.data[2])
+# datased = []
+# for i in range(1,7):
+# 	for j in range(cluster.data[i+1]):
+# 		datased[j].append(cluster.data[i+1][j])
+
+# print("dtaased", datased)
 print("Centroid terbaik: \n", centroid)
 print("Akurasi: ", akurasi)
 print("SSE: ", sse)
-# print("cluster", cluster)
+# print("cluster", cluster.__dict__)
 
-
+# make scatter
+# C = np.array(centroid)
+# ipca2 = IncrementalPCA(n_components=2)
+# ipca2.fit(C)
+# pca2 = ipca2.transform(C)
+# # cluster[0][0]
+# fig, axs = plt.subplots(1, 1, figsize=(5,5))
+# for i in range(k):
+# 	color = "#%06x" % random.randint(0, 0xFFFFFF)
+# 	# for j in range(len(cluster[i])):
+# 	# 	ke = cluster[i][j]
+# 	# 	x = pca[ke,0]
+# 	# 	y = pca[ke,1]
+# 	# 	axs.scatter(x,y,color=color,marker=">")
+# 	axs.scatter(pca2[i,0], pca2[i,1], marker="o")
+# plt.show()
