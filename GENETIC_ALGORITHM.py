@@ -48,15 +48,17 @@ def crossOver(prob):
 	# print("totChild: ", totChild)
 	return totChild
 
-def mutation(nP, chromosomes): #
-    # Mutation changes a single gene in each offspring randomly.
-    #print(chromosomes)
-    for idx in range(len(np)):
-        # The random value to be added to the gene.
-        random_value = np.random.uniform(0.0, 1.0)
-        chromosomes[idx,3] = chromosomes[idx,3] + random_value
+def mutation(nP, cluster): #
+	# Mutation changes a single gene in each offspring randomly.
+	length = len(cluster.__dict__['populasi'])
+	# print("chromosomes", cluster.__dict__['populasi'][length-1][2][3])
+	for idx in range(nP):
+		# The random value to be added to the gene.
+		for i in range(length):
+			random_value = np.random.uniform(0.0, 1.0)
+			cluster.__dict__['populasi'][i][idx][3] + random_value
 
-    return chromosomes
+	return cluster
 	
 def getCentroidPop(i):
 	cluster.centroids = cluster.populasi[i]
@@ -90,7 +92,7 @@ for i in range(0,70):
 	probChromosome.append((sortedFitness[i][0], sortedFitness[i][1]/totF*100))
 # print("probChromosome", probChromosome)
 
-#-------------------------- NEW GENERATION || FROM CROSS OVER --------------------------#
+#---------------------- NEW GENERATION || FROM CROSS OVER || MUTATION -----------------------#
 newGen = []
 for i in range(0, 70):
 	R = random.uniform(0, 1)
@@ -99,14 +101,17 @@ for i in range(0, 70):
 	else:
 		newGen.append(probChromosome[i][0])
 
-jumlahOffspring = crossOver(newGen)
+jmlOS = crossOver(newGen)
 newGeneration = []
 generasiKe = 0
+
+cluster = mutation(k, cluster)
 
 for i in range(2):
 	f = []
 	newGeneration = []
-	for i in range(0, jumlahOffspring):
+	# newGeneration = mutation(k, )
+	for i in range(0, jmlOS):
 		getCentroidPop(i)
 		cluster.clustering()
 		centroid, SSE, acc = cluster.groupData()
@@ -115,7 +120,7 @@ for i in range(2):
 		newGeneration.append(centroid)
 	generasiKe+=1
 
-	jumlahOffspring = crossOver(newGeneration)
+	jmlOS = crossOver(newGeneration)
 	newGeneration = []
 	sortedFitness = sorted(f, key=itemgetter(2), reverse=True)
 	# print("Generasi ke-%d" % generasiKe)
