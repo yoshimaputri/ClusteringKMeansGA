@@ -1,2 +1,8 @@
 # ClusteringKMeansGA
-clustering dataset Seeds dengan metode K-Means dan Optimasi Genetic Algorithm (GA)
+clustering dataset <b>Seeds</b> dengan metode K-Means dan Optimasi Genetic Algorithm (GA)
+
+RUN :
+K_means.py
+GENETIC_ALGORITHM.py
+
+with k = 3 (constant)
